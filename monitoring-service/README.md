@@ -1,8 +1,9 @@
 # Monitoring Service (MVP)
 
-[![Build Status](https://github.com/shkBostan/monitoring-service/actions/workflows/build.yml/badge.svg)](https://github.com/yourusername/monitoring-service/actions)
-[![Java](https://img.shields.io/badge/java-17-blue)](https://www.oracle.com/java/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)]()
+[![Java](https://img.shields.io/badge/Java-17-orange)]()
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.4-brightgreen)]()
 [![H2 Database](https://img.shields.io/badge/db-H2-orange)](https://www.h2database.com/html/main.html)
 
 Monitoring Service is a lightweight microservice monitoring system built with Spring Boot.
@@ -41,10 +42,11 @@ monitoring-service/
 ```
 ## Endpoints
 
-| Endpoint   | Method | Description |
-|-----------|--------|-------------|
-| /health   | GET    | Returns "Monitoring Service is running!" to check service health. |
-| /metrics  | GET    | Returns a sample JSON object with random metrics (cpu, memory, requests) for internal testing. |
+| Endpoint        | Method | Description                                                                 |
+|-----------------|--------|-----------------------------------------------------------------------------|
+| /health         | GET    | Returns "Monitoring Service is running!" to check service health.           |
+| /metrics        | GET    | Returns a sample JSON object with random metrics (cpu, memory, requests) for internal testing. |
+| /metrics/view   | GET    | Returns all collected metrics from the database in JSON format.             |
 
 **Example /metrics response:**
 
