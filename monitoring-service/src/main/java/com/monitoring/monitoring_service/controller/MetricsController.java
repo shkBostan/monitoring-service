@@ -1,9 +1,14 @@
 package com.monitoring.monitoring_service.controller;
 
+import com.monitoring.monitoring_service.model.Metric;
+import org.springframework.ui.Model;
+import com.monitoring.monitoring_service.service.MetricService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,6 +21,9 @@ import java.util.Map;
  */
 @RestController
 public class MetricsController {
+    @Autowired
+    MetricService metricService;
+
 
     /**
      * Returns random sample metrics.
@@ -32,5 +40,10 @@ public class MetricsController {
         return metrics;
     }
 
+
+    @GetMapping("/metrics/view")
+    public List<Metric> viewMetrics() {
+        return metricService.findAll();
+    }
 
 }

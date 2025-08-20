@@ -1,6 +1,6 @@
 # Monitoring Service (MVP)
 
-[![Build Status](https://github.com/yourusername/monitoring-service/actions/workflows/build.yml/badge.svg)](https://github.com/yourusername/monitoring-service/actions)
+[![Build Status](https://github.com/shkBostan/monitoring-service/actions/workflows/build.yml/badge.svg)](https://github.com/yourusername/monitoring-service/actions)
 [![Java](https://img.shields.io/badge/java-17-blue)](https://www.oracle.com/java/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![H2 Database](https://img.shields.io/badge/db-H2-orange)](https://www.h2database.com/html/main.html)
@@ -76,3 +76,9 @@ s Bostan
 ## Created
 
 Aug, 2025
+
+
+## License
+
+MIT License © 2025 S. Bostan  
+Free to use, modify, and distribute, **as long as the original author’s name is preserved**. No warranty is provided.

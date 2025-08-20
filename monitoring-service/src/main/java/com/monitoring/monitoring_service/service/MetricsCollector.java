@@ -2,11 +2,13 @@ package com.monitoring.monitoring_service.service;
 
 import com.monitoring.monitoring_service.model.Metric;
 import com.monitoring.monitoring_service.repository.MetricRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,4 +65,5 @@ public class MetricsCollector {
             System.err.println("Failed to collect metrics: " + e.getMessage());
         }
     }
+
 }
