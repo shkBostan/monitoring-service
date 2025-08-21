@@ -1,5 +1,6 @@
 package com.monitoring.monitoring_service.controller;
 
+import com.monitoring.monitoring_service.dto.MetricDto;
 import com.monitoring.monitoring_service.model.Metric;
 import org.springframework.ui.Model;
 import com.monitoring.monitoring_service.service.MetricService;
@@ -42,7 +43,7 @@ public class MetricsController {
 
 
     @GetMapping("/metrics/view")
-    public List<Metric> viewMetrics() {
+    public List<MetricDto> viewMetrics() {
         return metricService.findAll();
     }
 
