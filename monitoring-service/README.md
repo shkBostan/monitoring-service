@@ -137,7 +137,7 @@ You can explore all available endpoints and test them directly from the Swagger 
 Access it locally at: `http://localhost:8080/swagger-ui.html`
 
 ### Swagger UI Preview
-![Swagger UI Screenshot](docs/swagger-ui.png)
+![Swagger UI Screenshot](docs/swagger-ui.PNG)
 
 ## Author
 
