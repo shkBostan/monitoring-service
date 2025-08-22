@@ -71,6 +71,17 @@ No external database or Docker is required for MVP – H2 in-memory database is 
 Clone the repository:
    git clone https://github.com/shkBostan/monitoring-service.git
 
+
+## 📖 API Documentation
+
+This project includes interactive API documentation powered by **Swagger / OpenAPI**.  
+You can explore all available endpoints and test them directly from the Swagger UI.
+
+Access it locally at: `http://localhost:8080/swagger-ui.html`
+
+### Swagger UI Preview
+![Swagger UI Screenshot](docs/swagger-ui.PNG)
+
 ## Author
 
 s Bostan

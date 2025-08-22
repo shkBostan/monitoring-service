@@ -27,7 +27,6 @@ public class Metric {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String serviceName;
     private int cpu;
     private int memory;

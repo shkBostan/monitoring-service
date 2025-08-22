@@ -1,9 +1,10 @@
 package com.monitoring.monitoring_service.controller;
 
 import com.monitoring.monitoring_service.dto.MetricDto;
-import com.monitoring.monitoring_service.model.Metric;
-import org.springframework.ui.Model;
 import com.monitoring.monitoring_service.service.MetricService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,9 @@ import java.util.Map;
  * @author s Bostan
  */
 @RestController
+@Tag(name = "Metrics", description = "Endpoints for collecting and viewing metrics")
 public class MetricsController {
+
     @Autowired
     MetricService metricService;
 
@@ -32,6 +35,11 @@ public class MetricsController {
      *
      * @return a Map containing cpu, memory, and requests metrics
      */
+    @Operation(
+            summary = "Get random metrics",
+            description = "Returns random CPU, memory, and request count values for testing purposes."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved random metrics")
     @GetMapping("/metrics")
     public Map<String, Integer> getMetrics() {
         Map<String, Integer> metrics = new HashMap<>();
@@ -42,6 +50,11 @@ public class MetricsController {
     }
 
 
+    @Operation(
+            summary = "View all metrics from DB",
+            description = "Retrieves all collected metrics stored in the database as DTOs."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved stored metrics")
     @GetMapping("/metrics/view")
     public List<MetricDto> viewMetrics() {
         return metricService.findAll();
