@@ -1,5 +1,6 @@
 package com.monitoring.monitoring_service.service;
 
+import com.monitoring.monitoring_service.config.MonitoringConfig;
 import com.monitoring.monitoring_service.model.Metric;
 import com.monitoring.monitoring_service.repository.MetricRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,6 +27,8 @@ public class MetricsCollector {
 
     private final MetricRepository repository;
     private final RestTemplate restTemplate;
+    private final MonitoringConfig config;
+
 
     /**
      * Constructor injection for MetricRepository.
@@ -33,9 +36,10 @@ public class MetricsCollector {
      *
      * @param repository MetricRepository instance
      */
-    public MetricsCollector(MetricRepository repository) {
+    public MetricsCollector(MetricRepository repository, MonitoringConfig config) {
         this.repository = repository;
         this.restTemplate = new RestTemplate();
+        this.config = config;
     }
 
     /**
@@ -43,7 +47,7 @@ public class MetricsCollector {
      * Saves collected data into H2 database.
      * If endpoint is unavailable, logs the error without crashing.
      */
-    @Scheduled(fixedRate = 5000) // 5000 ms = 5 seconds
+    @Scheduled(fixedRateString = "#{@monitoringConfig.metricsCollectIntervalMs}")
     public void collectMetrics() {
         try {
             String url = "http://localhost:8080/metrics";
@@ -51,7 +55,7 @@ public class MetricsCollector {
 
             if (metrics != null) {
                 Metric metric = new Metric();
-                metric.setServiceName("MonitoringService");
+                metric.setServiceName(config.getServiceName());
                 metric.setCpu((Integer) metrics.get("cpu"));
                 metric.setMemory((Integer) metrics.get("memory"));
                 metric.setRequests((Integer) metrics.get("requests"));
