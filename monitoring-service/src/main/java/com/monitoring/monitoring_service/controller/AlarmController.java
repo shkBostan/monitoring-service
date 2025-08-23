@@ -3,11 +3,14 @@ package com.monitoring.monitoring_service.controller;
 import com.monitoring.monitoring_service.model.AlarmEntity;
 import com.monitoring.monitoring_service.repository.AlarmRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
+
 
 import java.time.LocalDateTime;
 
@@ -30,61 +33,50 @@ public class AlarmController {
     }
 
     /**
-     * Get alarms with optional filters, paging, and sorting.
+     * Filters and retrieves alarms based on severity and/or time range.
+     * <p>
+     * This endpoint supports the following filtering options:
+     * <ul>
+     *   <li>By severity only</li>
+     *   <li>By time range only (from, to)</li>
+     *   <li>By both severity and time range</li>
+     *   <li>If no filter is provided, all alarms are returned</li>
+     * </ul>
      *
-     * @param severity Optional: WARNING or CRITICAL
-     * @param from Optional: start of time range (ISO format)
-     * @param to Optional: end of time range (ISO format)
-     * @param page Optional: page number (default 0)
-     * @param size Optional: page size (default 20)
-     * @param sortBy Optional: field to sort by (default "timestamp")
-     * @param direction Optional: ASC or DESC (default DESC)
-     * @return Page of AlarmEntity
+     * @param severity Alarm severity (e.g., CRITICAL, WARNING, INFO)
+     * @param from Start of the time range (ISO DateTime format)
+     * @param to End of the time range (ISO DateTime format)
+     * @param pageable Pagination information (page, size, sort)
+     * @return A paginated list of alarms that match the filter criteria
      */
     @Operation(
-            summary = "Get alarms with filters, paging, and sorting",
-            description = "Retrieves alarms with optional severity/time filters, paged results, and sorting."
+            summary = "Filter alarms",
+            description = "Search alarms by severity and/or time range. "
+                    + "If no parameters are provided, all alarms will be returned.",
+            tags = {"Alarms"}
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved alarms")
     @GetMapping("/filter")
-    public Page<AlarmEntity> getAlarmsAdvanced(
+    public Page<AlarmEntity> getAlarms(
+            @Parameter(description = "Alarm severity (CRITICAL, WARNING, INFO)", example = "CRITICAL")
             @RequestParam(required = false) String severity,
+
+            @Parameter(description = "Start of the time range in ISO format", example = "2025-08-23T00:00:00")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+
+            @Parameter(description = "End of the time range in ISO format", example = "2025-08-23T23:59:59")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "timestamp") String sortBy,
-            @RequestParam(defaultValue = "DESC") String direction
+
+            @Parameter(hidden = true) Pageable pageable
     ) {
-        // Sorting configuration
-        Sort sort = direction.equalsIgnoreCase("ASC") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        // Build example for filtering by severity
-        AlarmEntity probe = new AlarmEntity();
-        if (severity != null && !severity.isEmpty()) {
-            probe.setSeverity(severity.toUpperCase());
+        if (severity != null && from != null && to != null) {
+            return alarmRepository.findBySeverityAndTimestampBetween(severity, from, to, pageable);
+        } else if (severity != null) {
+            return alarmRepository.findBySeverity(severity, pageable);
+        } else if (from != null && to != null) {
+            return alarmRepository.findByTimestampBetween(from, to, pageable);
+        } else {
+            return alarmRepository.findAll(pageable);
         }
-
-        ExampleMatcher matcher = ExampleMatcher.matching()
-                .withIgnorePaths("id", "serviceName", "metricName", "value", "timestamp", "message");
-
-        Example<AlarmEntity> example = Example.of(probe, matcher);
-
-        Page<AlarmEntity> alarms = alarmRepository.findAll(example, pageable);
-
-        // Filter by time range manually (since Example cannot filter LocalDateTime)
-        if (from != null || to != null) {
-            alarms = new PageImpl<>(
-                    alarms.stream()
-                            .filter(a -> (from == null || !a.getTimestamp().isBefore(from)) &&
-                                    (to == null || !a.getTimestamp().isAfter(to)))
-                            .toList(),
-                    pageable,
-                    alarms.getTotalElements()
-            );
-        }
-
-        return alarms;
     }
 }

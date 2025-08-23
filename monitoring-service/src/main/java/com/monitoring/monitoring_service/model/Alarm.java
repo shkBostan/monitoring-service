@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Alarm entity represents a triggered alarm.
+ * Alarm entity represents a triggered alarm.(to send notifier)
  *
  * @since Aug, 2025
  * @author s Bostan

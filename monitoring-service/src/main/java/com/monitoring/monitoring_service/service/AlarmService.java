@@ -9,7 +9,6 @@ import com.monitoring.monitoring_service.repository.AlarmRepository;
 import com.monitoring.monitoring_service.repository.MetricRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -105,7 +104,8 @@ public class AlarmService {
             entity.setTimestamp(alarm.getTimestamp());
             entity.setMessage(alarm.getMessage());
 
-            alarmRepository.save(entity);
+            AlarmEntity saved = alarmRepository.save(entity);
+            System.out.println("Saved AlarmEntity => "+ saved);
 
             lastAlarmTime = LocalDateTime.now();
         }

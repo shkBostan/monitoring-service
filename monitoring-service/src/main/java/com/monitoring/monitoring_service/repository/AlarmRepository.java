@@ -1,8 +1,12 @@
 package com.monitoring.monitoring_service.repository;
 
 import com.monitoring.monitoring_service.model.AlarmEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
 
 /**
  * AlarmRepository provides CRUD operations for AlarmEntity.
@@ -13,5 +17,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
-    // Optionally, you can add custom query methods here
-}
+
+    Page<AlarmEntity> findBySeverity(String severity, Pageable pageable);
+
+    Page<AlarmEntity> findByTimestampBetween(LocalDateTime from, LocalDateTime to, Pageable pageable);
+
+    Page<AlarmEntity> findBySeverityAndTimestampBetween(String severity, LocalDateTime from, LocalDateTime to, Pageable pageable);
+
+    }
