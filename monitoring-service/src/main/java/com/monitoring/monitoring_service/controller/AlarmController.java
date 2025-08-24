@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
  * @since Aug, 2025
  * @author s Bostan
  */
+@Slf4j
 @RestController
 @RequestMapping("/alarms")
 @Tag(name = "Alarms", description = "Endpoints for viewing alarm history with filters, paging, and sorting")
@@ -66,14 +68,29 @@ public class AlarmController {
 
             @Parameter(hidden = true) Pageable pageable
     ) {
+
+        log.debug("GET /alarms/filter called with severity={}, from={}, to={}, page={}, size={}",
+                severity, from, to, pageable.getPageNumber(), pageable.getPageSize());
+
+        try {
+            Page<AlarmEntity> result;
+
         if (severity != null && from != null && to != null) {
-            return alarmRepository.findBySeverityAndTimestampBetween(severity, from, to, pageable);
+            result = alarmRepository.findBySeverityAndTimestampBetween(severity, from, to, pageable);
         } else if (severity != null) {
-            return alarmRepository.findBySeverity(severity, pageable);
+            result = alarmRepository.findBySeverity(severity, pageable);
         } else if (from != null && to != null) {
-            return alarmRepository.findByTimestampBetween(from, to, pageable);
+            result = alarmRepository.findByTimestampBetween(from, to, pageable);
         } else {
-            return alarmRepository.findAll(pageable);
+            result = alarmRepository.findAll(pageable);
+        }
+
+            log.info("Retrieved {} alarms from repository", result.getNumberOfElements());
+            return result;
+
+        } catch (Exception e) {
+            log.error("Error retrieving alarms with filters severity={}, from={}, to={}: {}", severity, from, to, e.getMessage(), e);
+            throw e;
         }
     }
 }

@@ -3,11 +3,9 @@ package com.monitoring.monitoring_service.service;
 import com.monitoring.monitoring_service.dto.MetricDto;
 import com.monitoring.monitoring_service.model.Metric;
 import com.monitoring.monitoring_service.repository.MetricRepository;
-import org.springframework.jdbc.core.JdbcTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -15,6 +13,7 @@ import java.util.stream.Collectors;
  *
  * @author s Bostan
  */
+@Slf4j
 @Service
 public class MetricService {
     private final MetricRepository metricRepository;
@@ -29,9 +28,7 @@ public class MetricService {
     public void printMetrics() {
         List<MetricDto> metricDtos = findAll();
         for (MetricDto dto : metricDtos) {
-            System.out.println("MetricDto => id=" + dto.getId() +
-                    ", name=" + dto.getName() +
-                    ", value=" + dto.getValue());
+            log.info("MetricDto id={} name={} value={}", dto.getId(), dto.getName(), dto.getValue());
         }
     }
 
@@ -41,13 +38,34 @@ public class MetricService {
      * @return list of MetricDto
      */
     public List<MetricDto> findAll() {
-        return metricRepository.findAll()
-                .stream()
-                .flatMap(metric -> List.of(
-                        new MetricDto(metric.getId(), metric.getServiceName() + "_CPU", (double) metric.getCpu()),
-                        new MetricDto(metric.getId(), metric.getServiceName() + "_MEMORY", (double) metric.getMemory()),
-                        new MetricDto(metric.getId(), metric.getServiceName() + "_REQUESTS", (double) metric.getRequests())
-                ).stream())
-                .collect(Collectors.toList());
+        log.debug("Attempting to fetch all metrics from repository...");
+
+        List<MetricDto> result;
+        try {
+
+            // Fetch all metrics from repository
+            List<Metric> metrics = metricRepository.findAll();
+            log.info("Fetched {} metrics from repository.", metrics.size());
+
+            // Transform each Metric into multiple MetricDto objects
+            result = metrics.stream()
+                    .flatMap(metric -> {
+                        log.debug("Processing metric id={} service={}", metric.getId(), metric.getServiceName());
+                        return List.of(
+                                new MetricDto(metric.getId(), metric.getServiceName() + "_CPU", (double) metric.getCpu()),
+                                new MetricDto(metric.getId(), metric.getServiceName() + "_MEMORY", (double) metric.getMemory()),
+                                new MetricDto(metric.getId(), metric.getServiceName() + "_REQUESTS", (double) metric.getRequests())
+                        ).stream();
+                    })
+                    .collect(Collectors.toList());
+
+            log.info("Successfully transformed {} metrics into DTOs.", result.size());
+
+        } catch (Exception e) {
+            log.error("Error occurred while fetching metrics: {}", e.getMessage(), e);
+            throw e; //Rethrow the exception so it can be handled at a higher level
+        }
+
+        return result; // Return the result list of DTOs
     }
 }

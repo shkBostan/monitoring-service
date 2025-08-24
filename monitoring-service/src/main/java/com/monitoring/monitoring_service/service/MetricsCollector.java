@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +22,7 @@ import java.util.Map;
  * @since Aug, 2025
  * @author s Bostan
  */
+@Slf4j
 @Service
 public class MetricsCollector {
 
@@ -62,11 +63,13 @@ public class MetricsCollector {
                 metric.setTimestamp(LocalDateTime.now());
 
                 repository.save(metric);
-
-                System.out.println("Collected metrics: " + metric);
+                log.info("Collected metrics service={} cpu={} memory={} requests={}",
+                        metric.getServiceName(), metric.getCpu(), metric.getMemory(), metric.getRequests());
+            }else {
+                log.warn("Metrics endpoint returned null payload.");
             }
         } catch (Exception e) {
-            System.err.println("Failed to collect metrics: " + e.getMessage());
+            log.error("Failed to collect metrics from /metrics ", e);
         }
     }
 

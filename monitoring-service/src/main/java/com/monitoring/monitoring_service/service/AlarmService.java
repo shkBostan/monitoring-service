@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * AlarmService checks collected metrics against configured thresholds,
@@ -19,6 +20,7 @@ import java.util.List;
  * @since Aug, 2025
  * @author s Bostan
  */
+@Slf4j
 @Service
 public class AlarmService {
 
@@ -49,10 +51,12 @@ public class AlarmService {
     public void checkMetricsForAlarms() {
         List<Metric> metrics = metricRepository.findAll();
         if (metrics.isEmpty()) {
+            log.debug("No metrics found to evaluate.");
             return;
         }
 
         Metric latest = metrics.get(metrics.size() - 1); // latest metric entry
+        log.debug("Evaluating latest metrics for service={} at {}", latest.getServiceName(), latest.getTimestamp());
 
         checkThreshold(latest.getServiceName(), "CPU", latest.getCpu(),
                 alarmConfig.getCpuThresholdWarning(), alarmConfig.getCpuThresholdCritical());
@@ -77,6 +81,7 @@ public class AlarmService {
         if (severity != null) {
             // Respect cooldown to avoid spamming
             if (lastAlarmTime.plusSeconds(alarmConfig.getCooldownSeconds()).isAfter(LocalDateTime.now())) {
+                log.debug("Cooldown active; skip alarm for service={} metric={}", serviceName, metricName);
                 return;
             }
 
@@ -92,7 +97,7 @@ public class AlarmService {
 
             // Send to all Notifiers
             for (Notifier notifier : notifiers) {
-                System.out.println("notifier = " + notifier);
+                log.info("Dispatching alarm to notifier={}", notifier.getClass().getSimpleName());
                 notifier.notify(alarm);
             }
 
@@ -106,7 +111,8 @@ public class AlarmService {
             entity.setMessage(alarm.getMessage());
 
             AlarmEntity saved = alarmRepository.save(entity);
-            System.out.println("Saved AlarmEntity => "+ saved);
+            log.info("Alarm persisted id={} severity={} metric={} value={}",
+                    saved.getId(), saved.getSeverity(), saved.getMetricName(), saved.getMetricValue());
 
             lastAlarmTime = LocalDateTime.now();
         }

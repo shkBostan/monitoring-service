@@ -1,16 +1,17 @@
 package com.monitoring.monitoring_service.notifier;
 
 import com.monitoring.monitoring_service.model.Alarm;
-import org.apache.naming.factory.SendMailFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * EmailNotifier sends alarms via email.
  *
  * @since Aug, 2025
  */
+@Slf4j
 @Component
 public class EmailNotifier implements Notifier {
 
@@ -22,7 +23,6 @@ public class EmailNotifier implements Notifier {
 
     @Override
     public void notify(Alarm alarm) {
-        System.out.println("SendMail..." );
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo("s@gmail.com"); //Receiver email
@@ -36,10 +36,13 @@ public class EmailNotifier implements Notifier {
             );
 
             mailSender.send(message);
-        }catch (Exception e){
-            System.err.println(e);
+
+            log.info("Email sent for alarm severity={} service={} metric={} value={}",
+                    alarm.getSeverity(), alarm.getServiceName(), alarm.getMetricName(), alarm.getValue());
+
+        } catch (Exception e) {
+            log.error("Email send failed for alarm service={} metric={}", alarm.getServiceName(), alarm.getMetricName(), e);
         }
-        System.out.println("Email sent for alarm: " + alarm.getMessage());
     }
 
 }

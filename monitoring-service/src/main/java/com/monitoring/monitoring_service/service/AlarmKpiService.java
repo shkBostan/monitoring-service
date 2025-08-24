@@ -4,7 +4,7 @@ import com.monitoring.monitoring_service.dto.AlarmKpiDto;
 import com.monitoring.monitoring_service.model.AlarmEntity;
 import com.monitoring.monitoring_service.repository.AlarmRepository;
 import org.springframework.stereotype.Service;
-
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  *
  * @since Aug, 2025
  */
+@Slf4j
 @Service
 public class AlarmKpiService {
 
@@ -24,12 +25,28 @@ public class AlarmKpiService {
     }
 
     public AlarmKpiDto calculateKpi() {
-        List<AlarmEntity> alarms = alarmRepository.findAll();
+        log.debug("Starting KPI calculation for alarms...");
 
-        long total = alarms.size();
-        Map<String, Long> counts = alarms.stream()
-                .collect(Collectors.groupingBy(AlarmEntity::getSeverity, Collectors.counting()));
+        try {
+            // Fetch all alarms from repository
+            List<AlarmEntity> alarms = alarmRepository.findAll();
+            log.info("Fetched {} alarms from repository.", alarms.size());
 
-        return new AlarmKpiDto(total, counts);
+            // Group alarms by severity and count
+            Map<String, Long> counts = alarms.stream()
+                    .collect(Collectors.groupingBy(AlarmEntity::getSeverity, Collectors.counting()));
+
+            AlarmKpiDto kpiDto = new AlarmKpiDto(alarms.size(), counts);
+
+            log.info("KPI calculation successful: totalAlarms={}, counts={}", kpiDto.getTotalAlarms(), kpiDto.getSeverityCounts());
+            log.debug("KPI details: {}", kpiDto);
+
+            return kpiDto;
+        } catch (Exception e) {
+            log.error("Error occurred while calculating alarm KPI: {}", e.getMessage(), e);
+            throw e;
+        }
     }
+
+
 }
