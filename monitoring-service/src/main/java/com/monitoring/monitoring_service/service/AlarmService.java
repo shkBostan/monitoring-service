@@ -92,6 +92,7 @@ public class AlarmService {
 
             // Send to all Notifiers
             for (Notifier notifier : notifiers) {
+                System.out.println("notifier = " + notifier);
                 notifier.notify(alarm);
             }
 
