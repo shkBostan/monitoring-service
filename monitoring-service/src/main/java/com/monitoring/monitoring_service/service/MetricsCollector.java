@@ -3,6 +3,13 @@ package com.monitoring.monitoring_service.service;
 import com.monitoring.monitoring_service.config.MonitoringConfig;
 import com.monitoring.monitoring_service.model.Metric;
 import com.monitoring.monitoring_service.repository.MetricRepository;
+
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -11,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * MetricsCollector is responsible for periodically collecting metrics
@@ -31,6 +39,8 @@ public class MetricsCollector {
     private final MonitoringConfig config;
 
 
+
+
     /**
      * Constructor injection for MetricRepository.
      * Initializes RestTemplate for HTTP requests.
@@ -43,6 +53,21 @@ public class MetricsCollector {
         this.config = config;
     }
 
+
+    @Value("${spring.security.user.name}")
+    private String username;
+
+    @Value("${spring.security.user.password}")
+    private String password;
+
+
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void collectMetricsAfterStartup() {
+        log.info("Application fully started, executing initial metrics collection...");
+        collectMetrics(); // first save execution
+    }
+
     /**
      * Collects metrics from internal /metrics endpoint every 5 seconds.
      * Saves collected data into H2 database.
@@ -52,8 +77,21 @@ public class MetricsCollector {
     public void collectMetrics() {
         try {
             String url = "http://localhost:8080/metrics";
-            Map<String, Object> metrics = restTemplate.getForObject(url, Map.class);
 
+            //  (Basic Auth)
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(username, password);
+
+            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    requestEntity,
+                    Map.class
+            );
+
+            Map<String, Object> metrics = response.getBody();
             if (metrics != null) {
                 Metric metric = new Metric();
                 metric.setServiceName(config.getServiceName());
