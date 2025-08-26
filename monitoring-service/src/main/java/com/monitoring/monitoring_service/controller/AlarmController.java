@@ -11,6 +11,7 @@ import org.springframework.data.domain.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import org.slf4j.MDC;
 
 /**
  * Professional AlarmController provides endpoints to view alarm history
@@ -69,8 +70,8 @@ public class AlarmController {
             @Parameter(hidden = true) Pageable pageable
     ) {
 
-        log.debug("GET /alarms/filter called with severity={}, from={}, to={}, page={}, size={}",
-                severity, from, to, pageable.getPageNumber(), pageable.getPageSize());
+        log.debug("traceId={} | GET /alarms/filter called with severity={}, from={}, to={}, page={}, size={} ",
+                MDC.get("traceId"), severity, from, to, pageable.getPageNumber(), pageable.getPageSize());
 
         try {
             Page<AlarmEntity> result;
@@ -85,11 +86,11 @@ public class AlarmController {
             result = alarmRepository.findAll(pageable);
         }
 
-            log.info("Retrieved {} alarms from repository", result.getNumberOfElements());
+            log.info("traceId={} |Retrieved {} alarms from repository", MDC.get("traceId"), result.getNumberOfElements());
             return result;
 
         } catch (Exception e) {
-            log.error("Error retrieving alarms with filters severity={}, from={}, to={}: {}", severity, from, to, e.getMessage(), e);
+            log.error("traceId={} | Error retrieving alarms with filters severity={}, from={}, to={}: {}", MDC.get("traceId"), severity, from, to, e.getMessage(), e);
             throw e;
         }
     }
