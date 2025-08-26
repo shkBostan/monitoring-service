@@ -7,6 +7,7 @@ import com.monitoring.monitoring_service.model.Metric;
 import com.monitoring.monitoring_service.notifier.Notifier;
 import com.monitoring.monitoring_service.repository.AlarmRepository;
 import com.monitoring.monitoring_service.repository.MetricRepository;
+import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -56,7 +57,7 @@ public class AlarmService {
         }
 
         Metric latest = metrics.get(metrics.size() - 1); // latest metric entry
-        log.debug("Evaluating latest metrics for service={} at {}", latest.getServiceName(), latest.getTimestamp());
+        log.debug("Evaluating latest metrics for service={} at {}" , latest.getServiceName(), latest.getTimestamp());
 
         checkThreshold(latest.getServiceName(), "CPU", latest.getCpu(),
                 alarmConfig.getCpuThresholdWarning(), alarmConfig.getCpuThresholdCritical());

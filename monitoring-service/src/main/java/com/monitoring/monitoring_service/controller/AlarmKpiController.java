@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,13 +35,13 @@ public class AlarmKpiController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved KPI")
     @GetMapping
     public AlarmKpiDto getAlarmKpi() {
-        log.debug("GET /alarms/kpi called");
+        log.debug("traceId={} | GET /alarms/kpi called", MDC.get("traceId"));
         try {
             AlarmKpiDto kpi = kpiService.calculateKpi();
-            log.info("Successfully calculated alarm KPI: totalAlarms={}, counts={}", kpi.getTotalAlarms(), kpi.getSeverityCounts());
+            log.info("traceId={} | Successfully calculated alarm KPI: totalAlarms={}, counts={}", MDC.get("traceId") , kpi.getTotalAlarms(), kpi.getSeverityCounts());
             return kpi;
         } catch (Exception e) {
-            log.error("Error calculating alarm KPI: {}", e.getMessage(), e);
+            log.error("traceId={} | Error calculating alarm KPI: {}", MDC.get("traceId") , e.getMessage(), e);
             throw e;
         }
     }

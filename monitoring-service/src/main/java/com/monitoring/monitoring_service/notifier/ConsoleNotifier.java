@@ -1,6 +1,7 @@
 package com.monitoring.monitoring_service.notifier;
 
 import com.monitoring.monitoring_service.model.Alarm;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 

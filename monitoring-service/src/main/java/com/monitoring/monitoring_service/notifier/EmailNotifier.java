@@ -1,6 +1,7 @@
 package com.monitoring.monitoring_service.notifier;
 
 import com.monitoring.monitoring_service.model.Alarm;
+import org.slf4j.MDC;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;

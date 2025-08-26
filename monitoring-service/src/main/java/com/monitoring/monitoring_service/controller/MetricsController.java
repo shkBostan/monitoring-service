@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,15 +45,15 @@ public class MetricsController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved random metrics")
     @GetMapping("/metrics")
     public Map<String, Integer> getMetrics() {
-        log.debug("GET /metrics called: generating random metrics");
+        log.debug("traceId={} | GET /metrics called: generating random metrics", MDC.get("traceId"));
 
         Map<String, Integer> metrics = new HashMap<>();
         metrics.put("cpu", (int)(Math.random() * 100));// Random CPU usage
         metrics.put("memory", (int)(Math.random() * 100));// Random Memory usage
         metrics.put("requests", (int)(Math.random() * 1000));// Random number of requests
 
-        log.info("Generated random metrics: cpu={}, memory={}, requests={}",
-                metrics.get("cpu"), metrics.get("memory"), metrics.get("requests"));
+        log.info("traceId={} | Generated random metrics: cpu={}, memory={}, requests={}",
+                MDC.get("traceId"), metrics.get("cpu"), metrics.get("memory"), metrics.get("requests"));
 
         return metrics;
     }
@@ -65,14 +66,14 @@ public class MetricsController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved stored metrics")
     @GetMapping("/metrics/view")
     public List<MetricDto> viewMetrics() {
-        log.debug("GET /metrics/view called: fetching all metrics from database");
+        log.debug("traceId={} | GET /metrics/view called: fetching all metrics from database", MDC.get("traceId"));
 
         try {
             List<MetricDto> metricDtos = metricService.findAll();
-            log.info("Retrieved {} metrics from DB", metricDtos.size());
+            log.info("traceId={} | Retrieved {} metrics from DB", MDC.get("traceId"), metricDtos.size());
             return metricDtos;
         } catch (Exception e) {
-            log.error("Error fetching metrics from database: {}", e.getMessage(), e);
+            log.error("traceId={} | Error fetching metrics from database: {}", MDC.get("traceId"), e.getMessage(), e);
             throw e;
         }
     }

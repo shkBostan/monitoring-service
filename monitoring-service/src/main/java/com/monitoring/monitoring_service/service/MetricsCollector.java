@@ -4,6 +4,7 @@ import com.monitoring.monitoring_service.config.MonitoringConfig;
 import com.monitoring.monitoring_service.model.Metric;
 import com.monitoring.monitoring_service.repository.MetricRepository;
 
+import org.slf4j.MDC;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
@@ -107,7 +108,7 @@ public class MetricsCollector {
                 log.warn("Metrics endpoint returned null payload.");
             }
         } catch (Exception e) {
-            log.error("Failed to collect metrics from /metrics ", e);
+            log.error("Failed to collect metrics from /metrics " , e);
         }
     }
 

@@ -4,6 +4,7 @@ import com.monitoring.monitoring_service.dto.MetricDto;
 import com.monitoring.monitoring_service.model.Metric;
 import com.monitoring.monitoring_service.repository.MetricRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class MetricService {
     public void printMetrics() {
         List<MetricDto> metricDtos = findAll();
         for (MetricDto dto : metricDtos) {
-            log.info("MetricDto id={} name={} value={}", dto.getId(), dto.getName(), dto.getValue());
+            log.info("MetricDto id={} name={} value={}" , dto.getId(), dto.getName(), dto.getValue());
         }
     }
 

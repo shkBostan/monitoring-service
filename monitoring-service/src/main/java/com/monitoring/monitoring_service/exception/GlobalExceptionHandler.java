@@ -190,7 +190,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex, WebRequest request) {
-        log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
+        log.error("Unhandled exception occurred: {}" , ex.getMessage(), ex);
         return new ResponseEntity<>(buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), request), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

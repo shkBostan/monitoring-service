@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import java.util.UUID;
  * @since Aug, 2025
  * author s Bostan
  */
+@Slf4j
 @Component
 public class RequestLoggingFilter implements Filter {
 
@@ -39,8 +41,7 @@ public class RequestLoggingFilter implements Filter {
             if (request instanceof HttpServletRequest httpRequest) {
                 String path = httpRequest.getRequestURI();
                 String method = httpRequest.getMethod();
-                // log contextual info
-                System.out.printf("Incoming request: %s %s, traceId=%s%n", method, path, traceId);
+                log.info(" Incoming request: {} {}", method, path);
             }
 
             // continue request chain
