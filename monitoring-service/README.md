@@ -148,7 +148,5 @@ s Bostan
 Aug, 2025
 
 
-## License
-
-MIT License © 2025 S. Bostan  
-Free to use, modify, and distribute, **as long as the original author’s name is preserved**. No warranty is provided.
+## License  
+This project is licensed under the Apache License 2.0 – see the [LICENSE](LICENSE.txt) file for details.
