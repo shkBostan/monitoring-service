@@ -113,6 +113,20 @@ Monitoring Service follows a **modular microservice-oriented architecture**:
   }
 }
 ```
+---
+## 📈 Prometheus Integration
+
+This project integrates **Prometheus** using **Micrometer** to expose runtime metrics for monitoring and alerting.
+
+### 🔧 Configuration
+
+Prometheus metrics are exposed at:
+
+```
+http://localhost:8080/actuator/prometheus
+```
+
+---
 ## Getting Started
 
 ### Prerequisites
